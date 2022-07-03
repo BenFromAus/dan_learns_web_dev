@@ -51,13 +51,31 @@ pip install Flask
 
 ### Create the test file: test.py
 ```
-from flask import Flask
+from flask import Flask, jsonify, request
 app = Flask(__name__)
+
+test_data = [
+    {'value': 'this is some test data'}
+]
 
 
 @app.route("/")
-def test():
-  return "test response"
+def default_response_test():
+    return "test response"
+
+
+@app.route('/test')
+def get_test_data():
+    return jsonify(test_data)
+
+
+@app.route('/test', methods=['POST'])
+def add_test_data():
+    try:
+        test_data.append(request.get_json())
+        return '', 204
+    except:
+        return jsonify({'error': 'invalid request, failed to decode JSON'}), 400
 
 ```
 
@@ -90,5 +108,17 @@ You should see the server start:
 From a browser check you can hit the test server with the IP address shown in the output: http://192.168.64.2:5000/
 
 
+### Test GET and POST requests:
 
+You can interact with the demo server using curl:
+  
+GET example:
+```
+curl -v http://192.168.64.2:5000/test
+```
+  
+POST example:
+```
+curl -X POST -d '{"value":"another test value"}' -H 'Content-Type: application/json' http://192.168.64.2:5000/test
+```
 
